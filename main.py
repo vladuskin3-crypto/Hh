@@ -44,9 +44,9 @@ ADMIN_IDS = [8562897889]  # ЗАМЕНИТЕ НА СВОЙ ID!
 FLASK_API_KEY = os.getenv("FLASK_API_KEY", "lemon_spreader_secret_2024")
 
 # Цены
-PRICE_MONTH = 299
-PRICE_YEAR = 2490
-PRICE_LIFETIME = 4990
+PRICE_MONTH = 0
+PRICE_YEAR = 0
+PRICE_LIFETIME = 0
 
 # Настройки рассылки
 MAX_SESSIONS_PER_USER = 10
