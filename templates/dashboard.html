@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>LEMON SPREADER</title>
+    <style>
+        body { font-family: Arial; background: #1a1a2e; color: #fff; padding: 20px; }
+        .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
+        .card { background: #16213e; padding: 20px; border-radius: 10px; }
+        .number { font-size: 2em; color: #f5c842; }
+    </style>
+</head>
+<body>
+    <h1>🍋 LEMON SPREADER ULTRA</h1>
+    <div class="stats" id="stats">
+        <div class="card"><h3>Пользователи</h3><div class="number" id="users">0</div></div>
+        <div class="card"><h3>Сессии</h3><div class="number" id="sessions">0</div></div>
+        <div class="card"><h3>Рассылки</h3><div class="number" id="broadcasts">0</div></div>
+        <div class="card"><h3>Сегодня</h3><div class="number" id="today">0</div></div>
+    </div>
+    <script>
+        setInterval(() => {
+            fetch('/api/stats')
+                .then(r => r.json())
+                .then(d => {
+                    document.getElementById('users').textContent = d.total_users;
+                    document.getElementById('sessions').textContent = d.total_sessions;
+                    document.getElementById('broadcasts').textContent = d.total_broadcasts;
+                    document.getElementById('today').textContent = d.today_messages;
+                });
+        }, 5000);
+    </script>
+</body>
+                                                                                 </html>
