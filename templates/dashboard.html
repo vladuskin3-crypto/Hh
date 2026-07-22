@@ -1,33 +1,177 @@
 <!DOCTYPE html>
-<html>
+<html lang="ru">
 <head>
-    <title>LEMON SPREADER</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LEMON SPREADER ULTRA</title>
     <style>
-        body { font-family: Arial; background: #1a1a2e; color: #fff; padding: 20px; }
-        .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
-        .card { background: #16213e; padding: 20px; border-radius: 10px; }
-        .number { font-size: 2em; color: #f5c842; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: #0f0e17;
+            color: #fffffe;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        h1 {
+            text-align: center;
+            font-size: 2.5em;
+            margin-bottom: 30px;
+            color: #f5c842;
+            text-shadow: 0 0 20px rgba(245, 200, 66, 0.3);
+        }
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .card {
+            background: #1a1a2e;
+            padding: 25px;
+            border-radius: 15px;
+            text-align: center;
+            border: 1px solid #2a2a4a;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(245, 200, 66, 0.1);
+        }
+        .card h3 {
+            font-size: 1em;
+            color: #a7a9be;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .number {
+            font-size: 2.8em;
+            font-weight: bold;
+            color: #f5c842;
+            transition: all 0.3s;
+        }
+        .status {
+            text-align: center;
+            margin-top: 30px;
+            color: #a7a9be;
+            font-size: 0.9em;
+        }
+        .status .online {
+            color: #4caf50;
+            font-weight: bold;
+        }
+        .status .offline {
+            color: #f44336;
+            font-weight: bold;
+        }
+        .refresh-btn {
+            display: block;
+            margin: 20px auto;
+            padding: 12px 30px;
+            background: #f5c842;
+            color: #0f0e17;
+            border: none;
+            border-radius: 25px;
+            font-size: 1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .refresh-btn:hover {
+            background: #ffd966;
+            transform: scale(1.05);
+        }
+        @media (max-width: 600px) {
+            h1 { font-size: 1.8em; }
+            .stats { grid-template-columns: repeat(2, 1fr); gap: 15px; }
+            .number { font-size: 2em; }
+        }
     </style>
 </head>
 <body>
+
     <h1>🍋 LEMON SPREADER ULTRA</h1>
+
     <div class="stats" id="stats">
-        <div class="card"><h3>Пользователи</h3><div class="number" id="users">0</div></div>
-        <div class="card"><h3>Сессии</h3><div class="number" id="sessions">0</div></div>
-        <div class="card"><h3>Рассылки</h3><div class="number" id="broadcasts">0</div></div>
-        <div class="card"><h3>Сегодня</h3><div class="number" id="today">0</div></div>
+        <div class="card"><h3>👥 Пользователи</h3><div class="number" id="users">0</div></div>
+        <div class="card"><h3>📱 Сессии</h3><div class="number" id="sessions">0</div></div>
+        <div class="card"><h3>📤 Рассылки</h3><div class="number" id="broadcasts">0</div></div>
+        <div class="card"><h3>📊 Сегодня</h3><div class="number" id="today">0</div></div>
     </div>
+
+    <button class="refresh-btn" onclick="fetchStats()">🔄 Обновить</button>
+
+    <div class="status">
+        Статус: <span id="status" class="online">● Онлайн</span>
+        <span style="margin-left: 20px;">⏱ Обновлено: <span id="lastUpdate">--:--:--</span></span>
+    </div>
+
     <script>
-        setInterval(() => {
-            fetch('/api/stats')
-                .then(r => r.json())
-                .then(d => {
-                    document.getElementById('users').textContent = d.total_users;
-                    document.getElementById('sessions').textContent = d.total_sessions;
-                    document.getElementById('broadcasts').textContent = d.total_broadcasts;
-                    document.getElementById('today').textContent = d.today_messages;
+        const API_KEY = 'lemon_spreader_secret_2024'; // Должен совпадать с FLASK_API_KEY
+
+        async function fetchStats() {
+            try {
+                const response = await fetch('/api/stats', {
+                    headers: {
+                        'X-API-Key': API_KEY
+                    }
                 });
-        }, 5000);
+
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+
+                const data = await response.json();
+
+                document.getElementById('users').textContent = data.total_users ?? 0;
+                document.getElementById('sessions').textContent = data.total_sessions ?? 0;
+                document.getElementById('broadcasts').textContent = data.total_broadcasts ?? 0;
+                document.getElementById('today').textContent = data.today_messages ?? 0;
+
+                document.getElementById('status').textContent = '● Онлайн';
+                document.getElementById('status').className = 'online';
+
+                document.getElementById('lastUpdate').textContent = new Date().toLocaleTimeString();
+
+            } catch (error) {
+                console.error('Fetch error:', error);
+                document.getElementById('status').textContent = '● Офлайн';
+                document.getElementById('status').className = 'offline';
+
+                // Показываем последние известные данные из localStorage
+                const cached = localStorage.getItem('lemon_stats');
+                if (cached) {
+                    const data = JSON.parse(cached);
+                    document.getElementById('users').textContent = data.total_users ?? 0;
+                    document.getElementById('sessions').textContent = data.total_sessions ?? 0;
+                    document.getElementById('broadcasts').textContent = data.total_broadcasts ?? 0;
+                    document.getElementById('today').textContent = data.today_messages ?? 0;
+                }
+            }
+        }
+
+        // Кешируем данные в localStorage
+        async function fetchAndCache() {
+            try {
+                const response = await fetch('/api/stats', {
+                    headers: { 'X-API-Key': API_KEY }
+                });
+                if (response.ok) {
+                    const data = await response.json();
+                    localStorage.setItem('lemon_stats', JSON.stringify(data));
+                }
+            } catch (e) {}
+        }
+
+        // Запускаем
+        fetchStats();
+        setInterval(() => {
+            fetchStats();
+            fetchAndCache();
+        }, 10000); // 10 секунд вместо 5
     </script>
+
 </body>
-                                                                                 </html>
+    </html>
